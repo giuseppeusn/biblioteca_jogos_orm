@@ -1,27 +1,25 @@
 package br.com.biblioteca.dao;
 
-import br.com.biblioteca.entidades.Usuario;
+import br.com.biblioteca.entidades.Jogo;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-
 import java.util.List;
 
-public class UsuarioDAO {
+public class JogoDAO {
 
     private EntityManagerFactory emf;
 
-    public UsuarioDAO() {
+    public JogoDAO() {
         this.emf = JPAUtil.getEntityManagerFactory();
     }
 
-    public void salvar(Usuario usuario) {
+    public void salvar(Jogo jogo) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            em.persist(usuario);
+            em.persist(jogo);
             tx.commit();
         } catch (Exception e) {
             if (tx.isActive()) {
@@ -33,43 +31,41 @@ public class UsuarioDAO {
         }
     }
 
-    public Usuario buscarPorId(Long id) {
+    public Jogo buscarPorId(Long id) {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.find(Usuario.class, id);
+            return em.find(Jogo.class, id);
         } finally {
             em.close();
         }
     }
 
-    public Usuario buscarPorEmail(String email) {
+    public List<Jogo> buscarPorDesenvolvedoraId(Long desenvolvedoraId) {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
-                    .setParameter("email", email)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
+            return em.createQuery("SELECT j FROM Jogo j WHERE j.desenvolvedora.id = :id", Jogo.class)
+                    .setParameter("id", desenvolvedoraId)
+                    .getResultList();
         } finally {
             em.close();
         }
     }
 
-    public List<Usuario> listarTodos() {
+    public List<Jogo> listarTodos() {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.createQuery("FROM Usuario u", Usuario.class).getResultList();
+            return em.createQuery("FROM Jogo j", Jogo.class).getResultList();
         } finally {
             em.close();
         }
     }
 
-    public void atualizar(Usuario usuario) {
+    public void atualizar(Jogo jogo) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            em.merge(usuario);
+            em.merge(jogo);
             tx.commit();
         } catch (Exception e) {
             if (tx.isActive()) {
@@ -86,9 +82,9 @@ public class UsuarioDAO {
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            Usuario usuario = em.find(Usuario.class, id);
-            if (usuario != null) {
-                em.remove(usuario);
+            Jogo jogo = em.find(Jogo.class, id);
+            if (jogo != null) {
+                em.remove(jogo);
             }
             tx.commit();
         } catch (Exception e) {

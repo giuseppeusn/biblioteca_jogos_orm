@@ -1,27 +1,25 @@
 package br.com.biblioteca.dao;
 
-import br.com.biblioteca.entidades.Usuario;
+import br.com.biblioteca.entidades.Pedido;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-
 import java.util.List;
 
-public class UsuarioDAO {
+public class PedidoDAO {
 
     private EntityManagerFactory emf;
 
-    public UsuarioDAO() {
+    public PedidoDAO() {
         this.emf = JPAUtil.getEntityManagerFactory();
     }
 
-    public void salvar(Usuario usuario) {
+    public void salvar(Pedido pedido) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            em.persist(usuario);
+            em.persist(pedido);
             tx.commit();
         } catch (Exception e) {
             if (tx.isActive()) {
@@ -33,43 +31,41 @@ public class UsuarioDAO {
         }
     }
 
-    public Usuario buscarPorId(Long id) {
+    public Pedido buscarPorId(Long id) {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.find(Usuario.class, id);
+            return em.find(Pedido.class, id);
         } finally {
             em.close();
         }
     }
 
-    public Usuario buscarPorEmail(String email) {
+    public List<Pedido> buscarPorUsuarioId(Long usuarioId) {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.createQuery("SELECT u FROM Usuario u WHERE u.email = :email", Usuario.class)
-                    .setParameter("email", email)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
+            return em.createQuery("SELECT p FROM Pedido p WHERE p.usuario.id = :id", Pedido.class)
+                    .setParameter("id", usuarioId)
+                    .getResultList();
         } finally {
             em.close();
         }
     }
 
-    public List<Usuario> listarTodos() {
+    public List<Pedido> listarTodos() {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.createQuery("FROM Usuario u", Usuario.class).getResultList();
+            return em.createQuery("FROM Pedido p", Pedido.class).getResultList();
         } finally {
             em.close();
         }
     }
 
-    public void atualizar(Usuario usuario) {
+    public void atualizar(Pedido pedido) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            em.merge(usuario);
+            em.merge(pedido);
             tx.commit();
         } catch (Exception e) {
             if (tx.isActive()) {
@@ -86,9 +82,9 @@ public class UsuarioDAO {
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            Usuario usuario = em.find(Usuario.class, id);
-            if (usuario != null) {
-                em.remove(usuario);
+            Pedido pedido = em.find(Pedido.class, id);
+            if (pedido != null) {
+                em.remove(pedido);
             }
             tx.commit();
         } catch (Exception e) {
